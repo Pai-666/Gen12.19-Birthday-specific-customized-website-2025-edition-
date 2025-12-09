@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>小动物页面</title>
+    <style>
+        * {margin:0;padding:0;box-sizing:border-box;}
+        body {
+            min-height:100vh;
+            background:linear-gradient(135deg, #4facfe 0%, #ffe6f2 50%, #43e97b 100%);
+            border:3px solid #000;
+            position:relative;
+            padding:20px;
+            overflow:hidden;
+        }
+
+        /* 装饰元素 */
+        .cat-img {position:absolute;bottom: -15px;left: 5px;width:150px;height:150px;z-index:10;}
+        .cat-img1 {position:absolute;bottom: 100px;left: 15px;width:100px;height:100px;z-index:10;}
+        .folder-img {position:absolute;bottom: 140px;right: -15px;width:150px;height:150px;z-index:10;}
+        .folder-img1 {position:absolute;bottom: 20px;right: -20px;width:100px;height:100px;z-index:10;}
+
+        /* 猫窝 */
+        .cat-bed {
+            position:relative;
+            width:300px;
+            height:200px;
+            background:#8b5a2b;
+            border-radius:20px 20px 0 0;
+            margin:50px auto;
+            box-shadow:0 5px 10px rgba(0,0,0,0.2);
+            z-index:5;
+        }
+
+        /* 猫爬架 */
+        .cat-tree {
+            position:absolute;
+            top:100px;
+            right:200px;
+            width:50px;
+            height:300px;
+            background:#8b4513;
+            border-radius:5px;
+            z-index:5;
+        }
+        .cat-tree .layer {
+            position:absolute;
+            width:150px;
+            height:20px;
+            background:#cd853f;
+            border-radius:10px;
+            left:-50px;
+            z-index:5;
+        }
+        .cat-tree .layer1 {top:50px;}
+        .cat-tree .layer2 {top:150px;}
+        .cat-tree .layer3 {top:250px;}
+
+        /* 小猫样式（选中时高亮） */
+        .cat {
+            position:absolute;
+            width:40px;
+            height:40px;
+            background-size:cover;
+            background-position:center;
+            background-color: #ff9aa2;
+            border-radius:50%;
+            cursor:pointer;
+            z-index:8;
+            transition:transform 0.1s, box-shadow 0.2s;
+        }
+        .cat:hover {transform:scale(1.1);}
+        .cat.selected {
+            box-shadow:0 0 15px #ff6b6b; /* 选中时高亮发光 */
+            transform:scale(1.15);
+        }
+        /* 10只小猫不同颜色区分 */
+        #cat1 {background-color: #ff9aa2;}
+        #cat2 {background-color: #ffb7b2;}
+        #cat3 {background-color: #ffdac1;}
+        #cat4 {background-color: #e2f0cb;}
+        #cat5 {background-color: #b5ead7;}
+        #cat6 {background-color: #c7ceea;}
+        #cat7 {background-color: #f8c8dc;}
+        #cat8 {background-color: #d4a5a5;}
+        #cat9 {background-color: #92c9b1;}
+        #cat10 {background-color: #7472FE;}
+
+        /* 控制键 */
+        #controls {
+            position:absolute;
+            background:#fff;
+            padding:8px;
+            border:2px solid #87cefa;
+            border-radius:8px;
+            box-shadow:0 3px 6px rgba(0,0,0,0.2);
+            z-index:99;
+            display:none;
+        }
+        #controls button {
+            width:30px;
+            height:30px;
+            font-size:16px;
+            margin:2px;
+            border:none;
+            background:#bde0fe;
+            border-radius:4px;
+            cursor:pointer;
+        }
+        #controls button:active {background:#87cefa;}
+
+        /* 音乐框架样式（与原框架一致） */
+        .music-frame {
+            position:absolute;
+            top:20px;
+            right:20px;
+            width:200px;
+            height:200px;
+            border-radius:8px;
+            box-shadow:0 2px 5px rgba(0,0,0,0.1);
+            overflow:hidden;
+            background:linear-gradient(45deg, #e0f7fa, #b2ebf2);
+            z-index:9;
+        }
+        .music-frame .music-title {
+            position:absolute;
+            top:10px;
+            left:0;
+            width:100%;
+            text-align:center;
+            color:#333;
+            font-size:14px;
+            z-index:1;
+        }
+        .music-frame img {
+            width:calc(100% - 4mm);
+            height:calc(100% - 4mm);
+            margin:2mm;
+            object-fit:cover;
+            position:absolute;
+            top:0;left:0;
+        }
+        .music-frame audio {
+            position:absolute;
+            bottom:10px;
+            left:0;
+            width:100%;
+            padding:0 10px;
+            z-index:1;
+        }
+
+        /* 返回按钮（已修复闭合问题） */
+        .back-home {
+            position:absolute;
+            bottom:20px;
+            right:20px;
+            padding:10px 20px;
+            background:#bde0fe;
+            color:#333;
+            text-decoration:none;
+            border-radius:8px;
+            border:1px solid #87cefa;
+            box-shadow:0 2px 4px rgba(0,0,0,0.1);
+            cursor:pointer;
+            z-index:99;
+        } /* 已补充闭合 } */
+
+        .back-home:hover {background:#a2cffe;}
+        .back-home:active {transform:scale(0.95);}
+    </style>
+</head>
+<body>
+    <!-- 装饰元素（占位图兜底） -->
+    <img src="猫1.png" class="cat-img" alt="鲨鱼" onerror="this.src='https://via.placeholder.com/150';">
+    <img src="猫2.png" class="cat-img1" alt="猫" onerror="this.src='https://via.placeholder.com/100';">
+    <img src="紫藤花1.png" class="folder-img" alt="紫藤花1" onerror="this.src='https://via.placeholder.com/150';">
+    <img src="紫藤花2.png" class="folder-img1" alt="紫藤花2" onerror="this.src='https://via.placeholder.com/100';">
+
+    <!-- 音乐框架（小动物页面专属） -->
+    <div class="music-frame">
+        <div class="music-title">来，点这里，快点！</div>
+        <img src="猫2.png" alt="">
+        <audio controls loop id="music">
+            <source src="./把回忆拼好给你（女生版）.mp3" type="audio/mpeg">
+            您的浏览器不支持音频播放
+        </audio>
+    </div>
+
+    <!-- 猫窝 & 猫爬架 -->
+    <div class="cat-bed"></div>
+    <div class="cat-tree">
+        <div class="layer layer1"></div>
+        <div class="layer layer2"></div>
+        <div class="layer layer3"></div>
+    </div>
+
+    <!-- 10只小猫 -->
+    <div class="cat" id="cat1"></div>
+    <div class="cat" id="cat2"></div>
+    <div class="cat" id="cat3"></div>
+    <div class="cat" id="cat4"></div>
+    <div class="cat" id="cat5"></div>
+    <div class="cat" id="cat6"></div>
+    <div class="cat" id="cat7"></div>
+    <div class="cat" id="cat8"></div>
+    <div class="cat" id="cat9"></div>
+    <div class="cat" id="cat10"></div>
+
+    <!-- 控制键 -->
+    <div id="controls">
+        <button id="up">↑</button>
+        <div style="display:flex;justify-content:center;">
+            <button id="left">←</button>
+            <button id="right">→</button>
+        </div>
+        <button id="down">↓</button>
+    </div>
+
+    <!-- 提示框JS（确保执行） -->
+    <script>
+        // 页面加载后强制弹出提示
+        window.onload = function() {
+            setTimeout(() => {
+                const music = document.getElementById('music');
+                const isPlay = confirm("请您点击旁边的播放键来取消静音并开始播放音乐吧！");
+                if (isPlay) {
+                    music.muted = false;
+                    music.play().catch(err => alert("音乐播放失败，需要你手动点击一下播放控件哦~"));
+                } else {
+                    if (window.opener) window.close();
+                    else alert("播放取消，网页正常保持开启！你为什么取消播放难道是不喜欢吗？");
+                }
+            }, 500); // 延迟确保页面加载完成
+        };
+    </script>
+    
+    <!-- 返回主界面按钮 -->
+    <a href="耿.html" class="back-home">返回主界面</a>
+
+    <script>
+        // ========== 全局变量 ==========
+        const catTree = document.querySelector('.cat-tree');
+        const treeLayers = document.querySelectorAll('.cat-tree .layer');
+        const cats = document.querySelectorAll('.cat');
+        const controls = document.getElementById('controls');
+        let selectedCat = null;
+        const catSize = 40;
+        const padding = 20;
+        const moveSpeed = 3;
+        const catDirections = {};
+        const bounceForce = 5; // 碰撞弹开力度
+
+
+        // ========== 初始化每只小猫的移动方向 ==========
+        function initCatDirection(cat) {
+            const dirs = [
+                {dx: 0, dy: -moveSpeed},
+                {dx: moveSpeed, dy: -moveSpeed},
+                {dx: moveSpeed, dy: 0},
+                {dx: moveSpeed, dy: moveSpeed},
+                {dx: 0, dy: moveSpeed},
+                {dx: -moveSpeed, dy: moveSpeed},
+                {dx: -moveSpeed, dy: 0},
+                {dx: -moveSpeed, dy: -moveSpeed}
+            ];
+            const randomDir = dirs[Math.floor(Math.random() * dirs.length)];
+            catDirections[cat.id] = randomDir;
+        }
+
+
+        // ========== 障碍检测（边界+猫爬架） ==========
+        function isObstacle(catX, catY) {
+            // 边界检测
+            if (catX < padding || 
+                catX + catSize > window.innerWidth - padding || 
+                catY < padding || 
+                catY + catSize > window.innerHeight - padding) {
+                return true;
+            }
+
+            // 猫爬架柱子检测
+            const treeRect = catTree.getBoundingClientRect();
+            const catRect = {
+                left: catX,
+                right: catX + catSize,
+                top: catY,
+                bottom: catY + catSize
+            };
+            const hitPole = (
+                catRect.right > treeRect.left &&
+                catRect.left < treeRect.right &&
+                catRect.bottom > treeRect.top &&
+                catRect.top < treeRect.bottom
+            );
+            const layerBounds = Array.from(treeLayers).map(layer => layer.getBoundingClientRect());
+            const onLayer = layerBounds.some(layer => 
+                catRect.right > layer.left &&
+                catRect.left < layer.right &&
+                catRect.bottom > layer.top &&
+                catRect.top < layer.bottom
+            );
+
+            return hitPole && !onLayer;
+        }
+
+
+        // ========== 小猫之间碰撞检测 & 弹开逻辑 ==========
+        function checkCatCollisions() {
+            // 遍历所有小猫对
+            for (let i = 0; i < cats.length; i++) {
+                for (let j = i + 1; j < cats.length; j++) {
+                    const catA = cats[i];
+                    const catB = cats[j];
+                    
+                    const catAX = parseInt(catA.style.left) || padding;
+                    const catAY = parseInt(catA.style.top) || padding;
+                    const catBX = parseInt(catB.style.left) || padding;
+                    const catBY = parseInt(catB.style.top) || padding;
+
+                    // 计算中心点距离
+                    const dx = (catAX + catSize/2) - (catBX + catSize/2);
+                    const dy = (catAY + catSize/2) - (catBY + catSize/2);
+                    const distance = Math.sqrt(dx*dx + dy*dy);
+
+                    // 碰撞判定（距离小于小猫直径）
+                    if (distance < catSize) {
+                        // 计算反弹方向
+                        const angle = Math.atan2(dy, dx);
+                        // 猫A弹开
+                        catA.style.left = `${catAX + Math.cos(angle) * bounceForce}px`;
+                        catA.style.top = `${catAY + Math.sin(angle) * bounceForce}px`;
+                        // 猫B反向弹开
+                        catB.style.left = `${catBX - Math.cos(angle) * bounceForce}px`;
+                        catB.style.top = `${catBY - Math.sin(angle) * bounceForce}px`;
+
+                        // 交换/反向移动方向（避免再次碰撞）
+                        const tempDir = catDirections[catA.id];
+                        catDirections[catA.id] = catDirections[catB.id];
+                        catDirections[catB.id] = tempDir;
+                    }
+                }
+            }
+        }
+
+
+        // ========== 移动小猫（贪吃蛇逻辑+碰撞处理） ==========
+        function moveCat(cat, dx, dy) {
+            let x = parseInt(cat.style.left) || padding;
+            let y = parseInt(cat.style.top) || padding;
+
+            const newX = x + dx;
+            const newY = y + dy;
+
+            if (isObstacle(newX, newY)) {
+                initCatDirection(cat);
+                const newDir = catDirections[cat.id];
+                cat.style.left = `${x + newDir.dx}px`;
+                cat.style.top = `${y + newDir.dy}px`;
+            } else {
+                cat.style.left = `${newX}px`;
+                cat.style.top = `${newY}px`;
+            }
+        }
+
+
+        // ========== 初始化小猫位置和方向 ==========
+        function initCats() {
+            cats.forEach(cat => {
+                // 初始化位置（避免初始碰撞）
+                let x, y;
+                let collision = true;
+                let attempts = 0;
+                while (collision && attempts < 50) {
+                    x = padding + Math.random() * (window.innerWidth - catSize - 2 * padding);
+                    y = padding + Math.random() * (window.innerHeight - catSize - 2 * padding);
+                    collision = isObstacle(x, y);
+                    // 检查与其他小猫初始碰撞
+                    for (let other of cats) {
+                        if (other === cat) continue;
+                        const ox = parseInt(other.style.left) || padding;
+                        const oy = parseInt(other.style.top) || padding;
+                        const dx = (x + catSize/2) - (ox + catSize/2);
+                        const dy = (y + catSize/2) - (oy + catSize/2);
+                        const distance = Math.sqrt(dx*dx + dy*dy);
+                        if (distance < catSize) {
+                            collision = true;
+                            break;
+                        }
+                    }
+                    attempts++;
+                }
+                cat.style.left = `${x}px`;
+                cat.style.top = `${y}px`;
+
+                // 初始化方向
+                initCatDirection(cat);
+                // 移除选中样式
+                cat.classList.remove('selected');
+            });
+        }
+
+
+        // ========== 贪吃蛇式自动移动 ==========
+        function autoMoveCats() {
+            cats.forEach(cat => {
+                if (cat !== selectedCat) {
+                    const dir = catDirections[cat.id];
+                    moveCat(cat, dir.dx, dir.dy);
+                }
+            });
+            // 检测小猫之间碰撞
+            checkCatCollisions();
+        }
+
+
+        // ========== 页面加载初始化 ==========
+        window.addEventListener('load', () => {
+            initCats();
+            setInterval(autoMoveCats, 20);
+        });
+
+
+        // ========== 选中小猫控制（高亮+显示控制键） ==========
+        cats.forEach(cat => {
+            cat.addEventListener('click', (e) => {
+                e.stopPropagation();
+                // 取消之前选中的小猫样式
+                if (selectedCat) selectedCat.classList.remove('selected');
+                selectedCat = cat;
+                selectedCat.classList.add('selected'); // 选中高亮
+
+                // 控制键位置自适应
+                const catRect = cat.getBoundingClientRect();
+                let ctrlLeft = catRect.right + 10;
+                let ctrlTop = catRect.top - 10;
+
+                if (ctrlLeft + controls.offsetWidth > window.innerWidth) {
+                    ctrlLeft = catRect.left - controls.offsetWidth - 10;
+                }
+                if (ctrlTop < 0) {
+                    ctrlTop = catRect.bottom + 10;
+                }
+
+                controls.style.display = 'block';
+                controls.style.left = `${ctrlLeft}px`;
+                controls.style.top = `${ctrlTop}px`;
+            });
+        });
+
+
+        // ========== 点击屏幕取消选中（恢复自动移动） ==========
+        document.addEventListener('click', () => {
+            if (selectedCat) {
+                selectedCat.classList.remove('selected'); // 移除高亮
+                selectedCat = null; // 取消选中，恢复自动移动
+            }
+            controls.style.display = 'none';
+        });
+        controls.addEventListener('click', (e) => {
+            e.stopPropagation(); // 点击控制键不取消选中
+        });
+
+
+        // ========== 控制键+键盘控制选中小猫 ==========
+        function moveSelectedCat(dx, dy) {
+            if (selectedCat) {
+                const x = parseInt(selectedCat.style.left) || padding;
+                const y = parseInt(selectedCat.style.top) || padding;
+                const newX = x + dx;
+                const newY = y + dy;
+                if (!isObstacle(newX, newY)) {
+                    selectedCat.style.left = `${newX}px`;
+                    selectedCat.style.top = `${newY}px`;
+                }
+            }
+        }
+
+        // 按钮控制
+        document.getElementById('up').addEventListener('click', () => moveSelectedCat(0, -moveSpeed * 2));
+        document.getElementById('down').addEventListener('click', () => moveSelectedCat(0, moveSpeed * 2));
+        document.getElementById('left').addEventListener('click', () => moveSelectedCat(-moveSpeed * 2, 0));
+        document.getElementById('right').addEventListener('click', () => moveSelectedCat(moveSpeed * 2, 0));
+
+        // 键盘持续控制
+        let keyStates = {};
+        document.addEventListener('keydown', (e) => {
+            keyStates[e.key] = true;
+        });
+        document.addEventListener('keyup', (e) => {
+            keyStates[e.key] = false;
+        });
+
+        setInterval(() => {
+            if (!selectedCat) return;
+            if (keyStates['ArrowUp']) moveSelectedCat(0, -moveSpeed);
+            if (keyStates['ArrowDown']) moveSelectedCat(0, moveSpeed);
+            if (keyStates['ArrowLeft']) moveSelectedCat(-moveSpeed, 0);
+            if (keyStates['ArrowRight']) moveSelectedCat(moveSpeed, 0);
+        }, 20);
+
+
+        // ========== 窗口变化重新布局 ==========
+        window.addEventListener('resize', () => {
+            initCats();
+        });
+    </script>
+</body>
+</html>

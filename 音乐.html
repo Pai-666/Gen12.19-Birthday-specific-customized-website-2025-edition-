@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>音乐页面</title>
+    <style>
+        * {margin:0;padding:0;box-sizing:border-box;}
+        body {
+            min-height:100vh;
+            background:linear-gradient(135deg, #4facfe 0%, #ffe6f2 50%, #43e97b 100%);
+            border:3px solid #000;
+            position:relative;
+            padding:20px;
+            overflow-x: hidden; /* 关闭横向滚动 */
+            overflow-y: auto; /* 仅纵向滚动 */
+        }
+
+        /* 装饰元素 */
+        .cat-img {position:absolute;bottom: -15px;left: 5px;width:150px;height:150px;z-index:10;}
+        .cat-img1 {position:absolute;bottom: 100px;left: 15px;width:100px;height:100px;z-index:10;}
+        .folder-img {position:absolute;bottom: 140px;right: -15px;width: 150px;height: 150px;z-index:10;}
+        .folder-img1 {position:absolute;bottom: 20px;right: -20px;width: 100px;height: 100px;z-index:10;}
+
+        /* 音乐卡片容器：自动换行、垂直排列 */
+        .music-container {
+            display: flex;
+            flex-wrap: wrap; /* 自动换行 */
+            justify-content: flex-start; /* 从左到右排列 */
+            gap: 20px; /* 卡片间距 */
+            padding: 20px 0 80px;
+            max-width: 100%;
+        }
+
+        /* 音乐框架通用样式 */
+        .music-frame {
+            position:relative;
+            width:200px;
+            height:280px;
+            border-radius:8px;
+            box-shadow:0 2px 5px rgba(0,0,0,0.1);
+            overflow:hidden;
+            background:linear-gradient(45deg, #e0f7fa, #b2ebf2);
+            transition:all 0.3s ease;
+            z-index:1;
+        }
+        .music-frame .music-title {
+            position:absolute;
+            top:10px;
+            left:0;
+            width:100%;
+            text-align:center;
+            color:#333;
+            font-size:16px;
+            font-weight:500;
+            z-index:2;
+        }
+        .music-frame img {
+            width:calc(100% - 8px);
+            height:calc(100% - 80px);
+            margin:4px;
+            object-fit:cover;
+            position:absolute;
+            top:35px;
+            left:0;
+            border-radius:4px;
+            z-index:1;
+        }
+        .music-frame audio {
+            position:absolute;
+            bottom:10px;
+            left:0;
+            width:100%;
+            padding:0 8px;
+            z-index:2;
+        }
+
+        /* 放大居中样式 */
+        .music-frame.active {
+            position:fixed;
+            top:50%;
+            left:50%;
+            transform:translate(-50%, -50%);
+            width:400px;
+            height:560px;
+            z-index:100;
+            box-shadow:0 0 30px rgba(0,0,0,0.3);
+        }
+        .music-frame.active .music-title {font-size:24px;top:20px;}
+        .music-frame.active img {height:calc(100% - 120px);top:50px;margin:8px;}
+        .music-frame.active audio {bottom:20px;padding:0 15px;}
+
+        /* 返回按钮 */
+        .back-btn {
+            display:none;
+            position:absolute;
+            top:15px;
+            right:15px;
+            padding:8px 15px;
+            background:rgba(255,255,255,0.8);
+            border:none;
+            border-radius:50px;
+            color:#333;
+            font-size:14px;
+            cursor:pointer;
+            z-index:3;
+        }
+        .music-frame.active .back-btn {display:block;}
+        .back-btn:hover {background:white;}
+
+        /* 返回主界面按钮 */
+        .back-home {
+            position:absolute;
+            bottom:20px;
+            right:20px;
+            padding:10px 20px;
+            background:#bde0fe;
+            color:#333;
+            text-decoration:none;
+            border-radius:8px;
+            border:1px solid #87cefa;
+            box-shadow:0 2px 4px rgba(0,0,0,0.1);
+            z-index:99;
+        }
+
+        /* 遮罩层 */
+        .mask {
+            display:none;
+            position:fixed;
+            top:0;
+            left:0;
+            width:100%;
+            height:100%;
+            background:rgba(0,0,0,0.5);
+            z-index:90;
+        }
+        .mask.show {display:block;}
+    </style>
+</head>
+<body>
+    <div class="mask" id="mask"></div>
+
+    <!-- 装饰元素 -->
+    <img src="猫1.png" class="cat-img" alt="鲨鱼">
+    <img src="紫藤花1.png" class="folder-img" alt="紫藤花1">
+    <img src="紫藤花2.png" class="folder-img1" alt="紫藤花2">
+
+    <!-- 音乐框架容器（共20个） -->
+    <div class="music-container">
+        <!-- 1. 多幸运 -->
+        <div class="music-frame" data-index="1">
+            <button class="back-btn">返回</button>
+            <div class="music-title">多幸运</div>
+            <img src="微信图片_2025-11-28_223616_207.png" alt="多幸运">
+            <audio controls loop id="music">
+                <source src="./多幸运（Live）.mp3" type="audio/mpeg">
+                您的浏览器不支持音频播放
+            </audio>
+        </div>
+
+        <!-- 2. 雨爱 -->
+        <div class="music-frame" data-index="2">
+            <button class="back-btn">返回</button>
+            <div class="music-title">雨爱</div>
+            <img src="微信图片_20251128223416_662_18.jpg" alt="雨爱">
+            <audio controls loop id="music">
+                <source src="./雨爱.mp3" type="audio/mpeg">
+                您的浏览器不支持音频播放
+            </audio>
+        </div>
+
+        <!-- 3. 心做 -->
+        <div class="music-frame" data-index="3">
+            <button class="back-btn">返回</button>
+            <div class="music-title">心做</div>
+            <img src="微信图片_2025-11-28_223637_680.png" alt="心做">
+            <audio controls loop>
+                <source src="./心做（0.8）.mp3" type="audio/mpeg">
+                您的浏览器不支持音频播放
+            </audio>
+        </div>
+
+        <!-- 4. 晴天 -->
+        <div class="music-frame" data-index="4">
+            <button class="back-btn">返回</button>
+            <div class="music-title">晴天</div>
+            <img src="微信图片_20251128230904_667_18.jpg" alt="晴天">
+            <audio controls>
+                <source src="./晴天.mp3" type="audio/mpeg">
+                您的浏览器不支持音频播放
+            </audio>
+        </div>
+
+        <!-- 5. 新增空白框架 -->
+        <div class="music-frame" data-index="5">
+            <button class="back-btn">返回</button>
+            <div class="music-title">泡沫</div>
+            <img src="微信图片_20251203001021_686_18.jpg" alt="泡沫">
+            <audio controls>
+                <source src="泡沫（0.8氛围）.mp3" type="audio/mpeg">
+                您的浏览器不支持音频播放
+            </audio>
+        </div>
+
+        <!-- 6. 新增空白框架 -->
+        <div class="music-frame" data-index="6">
+            <button class="back-btn">返回</button>
+            <div class="music-title">客官不可以</div>
+            <img src="微信图片_20251203001022_687_18.jpg" alt="客官不可以">
+            <audio controls>
+                <source src="客官不可以（1.2）.mp3" type="audio/mpeg">
+                您的浏览器不支持音频播放
+        </div>
+
+        <!-- 7. 新增空白框架 -->
+        <div class="music-frame" data-index="7">
+            <button class="back-btn">返回</button>
+            <div class="music-title">第57次取消发送</div>
+            <img src="微信图片_20251203001023_688_18.jpg" alt="第57次取消发送">
+            <audio controls>
+                <source src="第57次取消发送.mp3" type="audio/mpeg">
+                您的浏览器不支持音频播放
+            </audio>
+        </div>
+
+        <!-- 8. 新增空白框架 -->
+        <div class="music-frame" data-index="8">
+            <button class="back-btn">返回</button>
+            <div class="music-title">坏女孩</div>
+            <img src="微信图片_20251203001024_689_18.jpg" alt="坏女孩">
+            <audio controls>
+                <source src="坏女孩.mp3" type="audio/mpeg">
+                您的浏览器不支持音频播放
+            </audio>
+        </div>
+
+        <!-- 9. 新增空白框架 -->
+        <div class="music-frame" data-index="9">
+            <button class="back-btn">返回</button>
+            <div class="music-title">还是会想你</div>
+            <img src="微信图片_20251203001025_690_18.jpg" alt="还是会想你">
+            <audio controls>
+                <source src="还是会想你（DJ）.mp3" type="audio/mpeg">
+                您的浏览器不支持音频播放
+        </div>
+
+        <!-- 10. 新增空白框架 -->
+        <div class="music-frame" data-index="10">
+            <button class="back-btn">返回</button>
+            <div class="music-title">大眠</div>
+            <img src="微信图片_20251203001026_691_18.jpg" alt="大眠">
+            <audio controls>
+                <source src="大眠.mp3" type="audio/mpeg">
+                您的浏览器不支持音频播放
+        </div>
+
+        <!-- 10. 新增空白框架 -->
+                <div class="music-frame" data-index="11">
+                    <button class="back-btn">返回</button>
+                    <div class="music-title">红色高跟鞋</div>
+                    <img src="微信图片_20251203001027_692_18.jpg" alt="红色高跟鞋">
+                    <audio controls>
+                        <source src="红色高跟鞋.mp3" type="audio/mpeg">
+                        您的浏览器不支持音频播放
+                </div>
+
+        <!-- 12. 新增空白框架 -->
+        <div class="music-frame" data-index="12">
+            <button class="back-btn">返回</button>
+            <div class="music-title">Ever where we go</div>
+            <img src="微信图片_20251203001028_693_18.jpg" alt="Ever where we go">
+            <audio controls>
+                <source src="Every where we go.mp3" type="audio/mpeg">
+                您的浏览器不支持音频播放
+        </div>
+
+        <!-- 13. 新增空白框架 -->
+        <div class="music-frame" data-index="13">
+            <button class="back-btn">返回</button>
+            <div class="music-title">
+Normal No More(哈基米)</div>
+            <img src="微信图片_20251203001029_694_18.jpg" alt="
+Normal No More(哈基米)">
+            <audio controls>
+                <source src="Normal No More(哈基米).mp3" type="audio/mpeg">
+                您的浏览器不支持音频播放
+        </div>
+
+        <!-- 14. 新增空白框架 -->
+        <div class="music-frame" data-index="14">
+            <button class="back-btn">返回</button>
+            <div class="music-title">Cry for me</div>
+            <img src="微信图片_20251203001030_695_18.jpg" alt="Cry for me">
+            <audio controls>
+                <source src="Cry For Me (R&B).mp3" type="audio/mpeg">
+                您的浏览器不支持音频播放
+        </div>
+
+        <!-- 15. 新增空白框架 -->
+        <div class="music-frame" data-index="15">
+            <button class="back-btn">返回</button>
+            <div class="music-title">爱情讯息</div>
+            <img src="微信图片_20251203001031_696_18.jpg" alt="爱情讯息">
+            <audio controls>
+                <source src="爱情讯息 (LIVE).mp3" type="audio/mpeg">
+                您的浏览器不支持音频播放
+        </div>
+
+        <!-- 16. 新增空白框架 -->
+        <div class="music-frame" data-index="16">
+            <button class="back-btn">返回</button>
+            <div class="music-title">把回忆拼好给你</div>
+            <img src="微信图片_20251203001032_697_18.jpg" alt="把回忆拼好给你">
+            <audio controls>
+                <source src="把回忆拼好给你（女生版）.mp3" type="audio/mpeg">
+                您的浏览器不支持音频播放
+        </div>
+
+        <!-- 17. 新增空白框架 -->
+        <div class="music-frame" data-index="17">
+            <button class="back-btn">返回</button>
+            <div class="music-title">其实</div>
+            <img src="微信图片_20251203001033_698_18.jpg" alt="其实">
+            <audio controls>
+                <source src="其实 (Live).mp3" type="audio/mpeg">
+                您的浏览器不支持音频播放
+        </div>
+
+        <!-- 18. 新增空白框架 -->
+        <div class="music-frame" data-index="18">
+            <button class="back-btn">返回</button>
+            <div class="music-title">花海</div>
+            <img src="微信图片_20251203001034_699_18.jpg" alt="花海">
+            <audio controls>
+                <source src="花海 (治愈女声版).mp3" type="audio/mpeg">
+                您的浏览器不支持音频播放
+        </div>
+
+        <!-- 19. 新增空白框架 -->
+        <div class="music-frame" data-index="19">
+            <button class="back-btn">返回</button>
+            <div class="music-title">The truth that you leave</div>
+            <img src="微信图片_20251203001035_700_18.jpg" alt="The truth that you leave">
+            <audio controls>
+                <source src="The truth that you leave.mp3" type="audio/mpeg">
+                您的浏览器不支持音频播放
+        </div>
+
+        <!-- 20. 最后一个框架 -->
+        <div class="music-frame" data-index="20">
+            <button class="back-btn">返回</button>
+            <div class="music-title">暂无其它内容...</div>
+            <img src="微信图片_2025-11-28_223106_863.png" alt="暂无其它内容...">
+            <audio controls id="music">
+                <source src="#" type="audio/mpeg">
+                您的浏览器不支持音频播放
+        </div>
+    </div>
+
+    <!-- 提示框JS -->
+    <script>
+        window.onload = function() {
+            setTimeout(() => {
+                const music = document.getElementById('music');
+                const isPlay = confirm("请您点击旁边的播放键来取消静音并开始播放音乐吧！");
+                if (isPlay) {
+                    music.muted = false;
+                    music.play().catch(err => alert("音乐播放失败，需要你手动点击一下播放控件哦~"));
+                } else {
+                    if (window.opener) window.close();
+                    else alert("播放取消，网页正常保持开启！你为什么取消播放难道是不喜欢吗？");
+                }
+            }, 500);
+        };
+    </script>
+
+    <!-- 返回主界面按钮 -->
+    <a href="耿.html" class="back-home">返回主界面</a>
+
+    <script>
+        // 放大/还原逻辑
+        const musicFrames = document.querySelectorAll('.music-frame');
+        const mask = document.getElementById('mask');
+
+        musicFrames.forEach(frame => {
+            frame.querySelector('audio').addEventListener('play', () => {
+                if (frame.dataset.index === '20') {
+                    alert('暂无其它内容...');
+                    frame.querySelector('audio').pause();
+                    return;
+                }
+                frame.classList.add('active');
+                mask.classList.add('show');
+            });
+
+            frame.querySelector('.back-btn').addEventListener('click', () => {
+                frame.classList.remove('active');
+                mask.classList.remove('show');
+                frame.querySelector('audio').pause();
+            });
+        });
+    </script>
+</body>
+</html>

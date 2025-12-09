@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>渐变色背景轮播页面</title>
+    <style>
+        * {margin:0;padding:0;box-sizing:border-box;}
+        body {
+            min-height:100vh;
+            background:linear-gradient(135deg, #4facfe 0%, #ffe6f2 50%, #43e97b 100%);
+            transition: background 1.5s ease;
+            border:3px solid #000;
+            position:relative;
+            overflow:hidden;
+            cursor:pointer; /* 提示可点击 */
+        }
+
+        /* 装饰元素 */
+        .cat-img {position:absolute;bottom: -15px;left: 5px;width:150px;height:150px;z-index:10;}
+        .cat-img1 {position:absolute;bottom: 100px;left: 15px;width:100px;height:100px;z-index:10;}
+        .folder-img {
+            position:absolute;
+            bottom: 140px;
+            right: -15px;
+            width: 150px;
+            height: 150px;
+            z-index:10;
+        }
+        .folder-img1 {
+            position:absolute;
+            bottom: 20px;
+            right: -20px;
+            width: 100px;
+            height: 100px;
+            z-index:10;
+        }
+
+        /* 音乐框架样式（与原框架一致） */
+        .music-frame {
+            position:absolute;
+            top:20px;
+            right:20px;
+            width:200px;
+            height:200px;
+            border-radius:8px;
+            box-shadow:0 2px 5px rgba(0,0,0,0.1);
+            overflow:hidden;
+            background:linear-gradient(45deg, #e0f7fa, #b2ebf2);
+            z-index:9;
+        }
+        .music-frame .music-title {
+            position:absolute;
+            top:10px;
+            left:0;
+            width:100%;
+            text-align:center;
+            color:#333;
+            font-size:14px;
+            z-index:1;
+        }
+        .music-frame img {
+            width:calc(100% - 4mm);
+            height:calc(100% - 4mm);
+            margin:2mm;
+            object-fit:cover;
+            position:absolute;
+            top:0;left:0;
+        }
+        .music-frame audio {
+            position:absolute;
+            bottom:10px;
+            left:0;
+            width:100%;
+            padding:0 10px;
+            z-index:1;
+        }
+
+        /* 返回按钮 */
+        .back-home {
+            position:absolute;
+            bottom:20px;
+            right:20px;
+            padding:10px 20px;
+            background:#bde0fe;
+            color:#333;
+            text-decoration:none;
+            border-radius:8px;
+            border:1px solid #87cefa;
+            box-shadow:0 2px 4px rgba(0,0,0,0.1);
+            cursor:pointer;
+            z-index:99;
+        }
+        .back-home:hover {background:#a2cffe;}
+        .back-home:active {transform:scale(0.95);}
+    </style>
+</head>
+<body>
+    <!-- 装饰元素 -->
+    <img src="猫1.png" class="cat-img" alt="猫" onerror="this.src='https://via.placeholder.com/150';">
+    <img src="猫2.png" class="cat-img1" alt="猫" onerror="this.src='https://via.placeholder.com/100';">
+    <img src="紫藤花1.png" class="folder-img" alt="紫藤花" onerror="this.src='https://via.placeholder.com/150';">
+    <img src="紫藤花2.png" class="folder-img1" alt="紫藤花" onerror="this.src='https://via.placeholder.com/100';">
+
+    <!-- 音乐框架（渐变背景页面专属） -->
+    <div class="music-frame">
+        <div class="music-title">来，点这里，快点！</div>
+        <img src="62f9aeb13b3cbb4242ed7b4010a1aff.jpg" alt="">
+        <audio controls loop id="music">
+            <source src="./稻香（女生版）.mp3" type="audio/mpeg">
+            您的浏览器不支持音频播放
+        </audio>
+    </div>
+
+    <!-- 提示框JS（确保执行） -->
+    	<script>
+    	    // 页面加载后强制弹出提示
+    	    window.onload = function() {
+    	        setTimeout(() => {
+    	            const music = document.getElementById('music');
+    	            const isPlay = confirm("请您点击旁边的播放键来取消静音并开始播放音乐吧！");
+    	            if (isPlay) {
+    	                music.muted = false;
+    	                music.play().catch(err => alert("音乐播放失败，需要你手动点击一下播放控件哦~"));
+    	            } else {
+    	                if (window.opener) window.close();
+    	                else alert("播放取消，网页正常保持开启！你为什么取消播放难道是不喜欢吗？");
+    	            }
+    	        }, 500); // 延迟确保页面加载完成
+    	    };
+    	</script>
+    
+        <!-- 返回主界面按钮 -->
+        <a href="耿.html" class="back-home">返回主界面</a>
+
+    <script>
+        // 渐变色背景列表
+        const gradientList = [
+            "linear-gradient(135deg, #4facfe 0%, #ffe6f2 50%, #43e97b 100%)",
+            "linear-gradient(135deg, #ff9a9e 0%, #fad0c4 50%, #fad0c4 100%)",
+            "linear-gradient(135deg, #a1c4fd 0%, #c2e9fb 50%, #a1c4fd 100%)",
+            "linear-gradient(135deg, #f6d365 0%, #fda085 50%, #f6d365 100%)",
+            "linear-gradient(135deg, #84fab0 0%, #8fd3f4 50%, #84fab0 100%)",
+            "linear-gradient(135deg, #d4fc79 0%, #96e6a1 50%, #d4fc79 100%)",
+            "linear-gradient(135deg, #ffecd2 0%, #fcb69f 50%, #ffecd2 100%)"
+        ];
+        let currentIndex = 0;
+
+        // 切换背景函数
+        function switchBackground() {
+            currentIndex = (currentIndex + 1) % gradientList.length;
+            document.body.style.background = gradientList[currentIndex];
+        }
+
+        // 自动切换（5秒一次）
+        setInterval(switchBackground, 5000);
+
+        // 点击屏幕切换（排除返回按钮和音乐框架）
+        document.body.addEventListener('click', (e) => {
+            if (!e.target.classList.contains('back-home') && !e.target.closest('.music-frame')) {
+                switchBackground();
+            }
+        });
+    </script>
+</body>
+</html>

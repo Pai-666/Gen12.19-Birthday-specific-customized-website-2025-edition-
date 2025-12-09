@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>渐变背景装饰页</title>
+    <style>
+        * {margin:0;padding:0;box-sizing:border-box;}
+        body {
+            min-height:100vh;
+            background:linear-gradient(135deg, #4facfe 0%, #ffe6f2 50%, #43e97b 100%);
+            border:3px solid #000;
+            position:relative;
+            padding:20px;
+            overflow:visible !important; /* 强制显示溢出元素 */
+        }
+
+        /* 装饰图片 */
+        .cat-img {
+         position:absolute;
+         top: -30px; 
+         left: -5px; 
+         width:150px;
+         height:150px;
+         z-index:10;
+       }
+       
+       .cat-img1 {
+         position:absolute;
+         top: 120px; 
+         left: 5px; 
+         width:100px;
+         height:100px;
+         z-index:10;
+       }
+       .folder-img {
+         position:absolute;
+         bottom: 140px; 
+         right: -15px; 
+         width: 150px;
+         height: 150px;
+         z-index:10;
+       }
+       
+       .folder-img1 {
+         position:absolute;
+         bottom: 20px; 
+         right: -20px;
+         width: 100px;
+         height: 100px;
+         z-index:10;
+       }
+        /* 漂浮动画 */
+        @keyframes float-random {
+            0% {transform:translate(0,0) rotate(0deg);}
+            20% {transform:translate(var(--x1),var(--y1)) rotate(var(--r1));}
+            45% {transform:translate(var(--x2),var(--y2)) rotate(var(--r2));}
+            70% {transform:translate(var(--x3),var(--y3)) rotate(var(--r3));}
+            90% {transform:translate(var(--x4),var(--y4)) rotate(var(--r4));}
+            100% {transform:translate(0,0) rotate(0deg);}
+        }
+
+        /* 文字框+空白框基础样式 */
+        .floating-box {
+            position:absolute !important; 
+            padding:10px 15px;
+            background:#ffe6f2;
+            color:#000;
+            font-weight:bold;
+            border-radius:8px;
+            text-decoration:none;
+            font-size:14px;
+            cursor:pointer;
+            box-shadow:0 2px 5px rgba(0,0,0,0.1);
+            z-index:5 !important; 
+            animation:float-random var(--duration) ease-in-out infinite;
+            animation-delay:var(--delay);
+        }
+
+        .empty-box {
+            color:transparent;
+            cursor:default;
+            padding:15px 20px;
+            width:80px;
+            height:50px;
+        }
+
+        .floating-box:not(.empty-box):active {
+            transform:scale(0.95);
+            background:#ffcce5;
+        }
+
+        /* 心率线（强制显示+跳动） */
+        #heartLine {
+            position:absolute !important;
+            bottom:30px !important;
+            left:50% !important;
+            transform:translateX(-50%) !important;
+            width:calc(100%*2/3) !important;
+            height:6px;
+            background:#ff0000 !important;
+            border-radius:3px;
+            z-index:8 !important;
+            transition:height 0.05s ease;
+            animation: line-beat 1s ease-in-out infinite alternate;
+        }
+
+        @keyframes line-beat {
+            0% {height:6px;}
+            50% {height:15px;}
+            100% {height:6px;}
+        }
+
+        /* 心率图标 */
+        .heart-icon {
+          position:absolute !important;
+          bottom:23px !important; 
+          left:calc(50% - (100%*1/3) - 40px) !important;
+          width:35px;
+          height:35px;
+          z-index:9 !important;
+          animation:heart-beat 1.2s infinite;
+        }
+
+        @keyframes heart-beat {
+            0%{transform:scale(1);}15%{transform:scale(1.3);}30%{transform:scale(1);}45%{transform:scale(1.4);}60%{transform:scale(1);}75%{transform:scale(1.2);}90%{transform:scale(1);}100%{transform:scale(1);}
+        }
+
+        /* 音乐框架样式（与图2一致） */
+        .music-frame {
+            position:absolute;
+            top:20px;
+            right:20px;
+            width:200px;
+            height:200px;
+            border-radius:8px;
+            box-shadow:0 2px 5px rgba(0,0,0,0.1);
+            overflow:hidden;
+            background:linear-gradient(45deg, #e0f7fa, #b2ebf2);
+            z-index:9;
+        }
+        .music-frame .music-title {
+            position:absolute;
+            top:10px;
+            left:0;
+            width:100%;
+            text-align:center;
+            color:#333;
+            font-size:14px;
+            z-index:1;
+        }
+        .music-frame img {
+            width:calc(100% - 4mm);
+            height:calc(100% - 4mm);
+            margin:2mm;
+            object-fit:cover;
+            position:absolute;
+            top:0;left:0;
+        }
+        .music-frame audio {
+            position:absolute;
+            bottom:10px;
+            left:0;
+            width:100%;
+            padding:0 10px;
+            z-index:1;
+        }
+
+        /* 漂浮框位置参数 */
+        .box1{top:10%;left:10%;--duration:8s;--delay:0s;--x1:50px;--y1:-30px;--r1:3deg;}
+        .box2{top:25%;left:25%;--duration:10s;--delay:0.5s;--x1:-40px;--y1:-20px;--r1:-1deg;}
+        .box3{top:15%;right:15%;--duration:7s;--delay:1s;--x1:-30px;--y1:40px;--r1:2deg;}
+        .box4{top:40%;left:20%;--duration:11s;--delay:1.5s;--x1:70px;--y1:20px;--r1:-3deg;}
+        .box5{top:50%;right:25%;--duration:9s;--delay:2s;--x1:-20px;--y1:-50px;--r1:4deg;}
+        .box6{top:65%;left:30%;--duration:12s;--delay:2.5s;--x1:30px;--y1:60px;--r1:-1deg;}
+        .box7{top:20%;left:45%;--duration:6s;--delay:0.3s;--x1:-50px;--y1:30px;--r1:2deg;}
+        .box8{top:35%;right:35%;--duration:10s;--delay:1.2s;--x1:60px;--y1:-20px;--r1:-4deg;}
+        .box9{top:55%;left:15%;--duration:8s;--delay:1.8s;--x1:30px;--y1:-50px;--r1:1deg;}
+        .box10{top:70%;right:10%;--duration:7s;--delay:0.7s;--x1:-40px;--y1:60px;--r1:-2deg;}
+        .box11{top:30%;left:60%;--duration:11s;--delay:2.2s;--x1:50px;--y1:15px;--r1:3deg;}
+        .box12{top:50%;left:40%;--duration:9s;--delay:0.2s;--x1:-30px;--y1:-30px;--r1:-2deg;}
+        .box13{top:15%;right:40%;--duration:8s;--delay:1.6s;--x1:20px;--y1:40px;--r1:-3deg;}
+        .box14{top:60%;right:30%;--duration:10s;--delay:2.8s;--x1:-50px;--y1:-40px;--r1:1deg;}
+        .box15{top:45%;left:70%;--duration:7s;--delay:0.9s;--x1:60px;--y1:-30px;--r1:-1deg;}
+        .box16{top:25%;right:55%;--duration:9s;--delay:2.1s;--x1:-20px;--y1:50px;--r1:4deg;}
+    </style>
+</head>
+<body>
+    <!-- 音乐框架（修改为图2样式） -->
+    <div class="music-frame">
+        <div class="music-title">来，点这里，快点！</div>
+        <img src="微信图片_20251130001232_671_18.jpg" alt="">
+        <audio controls id="music">
+            <source src="./多幸运（Live）.mp3" type="audio/mpeg">
+            您的浏览器不支持音频播放
+        </audio>
+    </div>
+    <!-- 装饰图片（原内容保留） -->
+    <img src="猫1.png" class="cat-img" alt="">
+	<img src="猫2.png" class="cat-img1" alt="">
+    <img src="紫藤花1.png" class="folder-img" alt="">
+	<img src="紫藤花2.png" class="folder-img1" alt="">
+
+    <!-- 文字框（原内容保留） -->
+    <a href="电影.html" class="floating-box box1">看会电影呗！</a>
+    <a href="音乐.html" class="floating-box box2">学累了就，听一首歌放松放松把！</a>
+    <a href="电视剧.html" class="floating-box box3">深夜了，快来追剧！</a>
+    <a href="小动物.html" class="floating-box box4">快来，这里有你最喜欢的小动物！</a>
+    <a href="小花朵.html" class="floating-box box5">你不是喜欢小花吗，快来这里！</a>
+    <a href="幸运色.html" class="floating-box box6">快看，蓝绿色是你的幸运色！</a>
+
+    <!-- 空白框（原内容保留） -->
+    <div class="floating-box empty-box box7"></div>
+    <div class="floating-box empty-box box8"></div>
+    <div class="floating-box empty-box box9"></div>
+    <div class="floating-box empty-box box10"></div>
+    <div class="floating-box empty-box box11"></div>
+    <div class="floating-box empty-box box12"></div>
+    <div class="floating-box empty-box box13"></div>
+    <div class="floating-box empty-box box14"></div>
+    <div class="floating-box empty-box box15"></div>
+    <div class="floating-box empty-box box16"></div>
+
+    <!-- 心率线+图标（原内容保留） -->
+    <div id="heartLine"></div>
+    <img src="心脏.png" class="heart-icon" alt="">
+
+    <!-- 提示框JS（修正选择器） -->
+    <script>
+        window.onload = function() {
+            setTimeout(() => {
+                const music = document.querySelector('.music-frame audio');
+                const isPlay = confirm("是否取消静音并开始播放音乐？");
+                if (isPlay) {
+                    music.muted = false;
+                    music.play().catch(err => alert("音乐播放失败，需要你手动点击一下播放控件哦~"));
+                } else {
+                    if (window.opener) window.close();
+                    else alert("播放取消，网页正常保持开启！你为什么取消播放难道是不喜欢吗？");
+                }
+            }, 500);
+        };
+    </script>
+</body>
+</html>
